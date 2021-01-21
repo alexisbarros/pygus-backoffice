@@ -9,6 +9,7 @@ import './HomeStyle.css';
 
 // Components
 import TasksList from '../TasksList/TasksListContainer';
+import TasksForm from '../TaskForm/TaskFormContainer';
 
 const { Header, Content, Sider } = Layout;
 
@@ -55,7 +56,7 @@ const HomeView = (props) => {
                             
                         <Menu.Item key="2">
                             <Link to='/home/task'>
-                                Adicionar tarefa
+                                Tarefas
                             </Link>
                         </Menu.Item>
                         
@@ -82,7 +83,9 @@ const HomeView = (props) => {
                         }}
                     >
                         
-                        {props.location.pathname === '/home/task' ? <TasksList parent_props={props} /> : null }
+                        {props.location.pathname === '/home/task' && !props.location.search ? <TasksList parent_props={props} /> : null }
+                        {props.location.pathname === '/home/task' && props.location.search ? <TasksForm parent_props={props} /> : null }
+                        {props.location.pathname === '/home/task/new' ? <TasksForm parent_props={props} /> : null }
 
                     </Content>
 

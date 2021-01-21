@@ -7,8 +7,6 @@ import TasksListView from './TasksListView';
 
 const TasksListContainer = (props) => {
 
-    console.log(props);
-
     return(
 
         <TasksListView
