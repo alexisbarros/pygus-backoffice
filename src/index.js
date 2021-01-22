@@ -7,6 +7,8 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 // Components
 import Login from './Components/Login/LoginContainer';
 import Home from './Components/Home/HomeContainer';
+import Cadastro from './Components/Cadastro/CadastroContainer';
+
 
 ReactDOM.render(
   
@@ -18,6 +20,8 @@ ReactDOM.render(
 
         <Route path='/login' exact component={Login} />
         <Route path='/home' component={Home} />
+        <Route path='/cadastro' component={Cadastro} />
+
 
       </Switch>
     
