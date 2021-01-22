@@ -29,7 +29,8 @@ const LoginView = (props) => {
                     style={{
                         marginBottom: 10
                     }}
-                    />
+                    onChange={e => props.setLoginForm({ ...props.loginForm, email: e.target.value })}
+                />
                 
                 <Input 
                     placeholder='Senha' 
@@ -37,6 +38,7 @@ const LoginView = (props) => {
                     style={{
                         marginBottom: 10
                     }}
+                    onChange={e => props.setLoginForm({ ...props.loginForm, password: e.target.value })}
                 />
 
                 <Button 
@@ -45,9 +47,15 @@ const LoginView = (props) => {
                         width: '100%',
                         marginBottom: 10
                     }}
+                    onClick={() => props.login()}
+                    loading={props.loginButtonLoading}
+                    disabled={!props.loginForm.email || !props.loginForm.password}
                 >Entrar</Button>
 
-                <Checkbox>
+                <Checkbox
+                    checked={props.saveLoginInfo}
+                    onChange={() => props.setSaveLoginInfo(!props.saveLoginInfo)}
+                >
                     Mantenha conectado
                 </Checkbox>
 
