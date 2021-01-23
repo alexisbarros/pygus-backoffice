@@ -10,18 +10,6 @@ import './TaskFormStyle.css';
 
 const TaskFormView = (props) => {
 
-    // MOCK sillables
-    const sillables = [
-        {
-            sillable: 'bo',
-            audio: 'bo.mp3'
-        },
-        {
-            sillable: 'ca',
-            audio: 'ca.mp3'
-        }
-    ];
-
     const normFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -39,11 +27,18 @@ const TaskFormView = (props) => {
             }}
         >
             <Modal
-                visible={props.sillableModal}
+                visible={props.syllableModal}
                 title='Adicionar uma sílaba'
-                onOk={() => props.addSillable}
+                onOk={() => {
+                    let syllablesArray = props.taskForm.syllables;
+                    syllablesArray.push(props.syllableToPush);
+                    
+                    props.setTaskForm({ ...props.taskForm, syllables: syllablesArray });
+                    props.setSyllableToPush('');
+                    props.openCloseSyllableModal(false);
+                }}
                 okText='Adicionar'
-                onCancel={() => props.openCloseSillableModal(false)}
+                onCancel={() => props.openCloseSyllableModal(false)}
                 cancelText='Cancelar'
             >
                 <Form
@@ -52,9 +47,12 @@ const TaskFormView = (props) => {
                     
                     <Form.Item
                         label="Sílaba"
-                        name="sillable"
+                        // name="syllable"
                     >
-                        <Input />
+                        <Input 
+                            value={props.syllableToPush}
+                            onChange={e => props.setSyllableToPush(e.target.value) }
+                        />
                     </Form.Item>
 
                     <Form.Item
@@ -106,7 +104,7 @@ const TaskFormView = (props) => {
                         
                         <Form.Item
                             label="Nome"
-                            name="name"
+                            // name="name"
                             style={{
                                 width: 500
                             }}
@@ -119,7 +117,40 @@ const TaskFormView = (props) => {
                                 ]
                             }
                         >
-                            <Input />
+                            <Input
+                                value={props.taskForm.name}
+                                onChange={e => props.setTaskForm({ ...props.taskForm, name: e.target.value })}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            // name="image"
+                            label="Imagem"
+                        >
+                            
+                            <Button 
+                                icon={<UploadOutlined />}
+                                onClick={() => document.getElementById('task-img-file').click()}
+                                style={{ marginBottom: '10px' }}
+                            >Enviar imagem</Button><br />
+
+                            <span style={{ color: '#6495ED', fontSize: 12 }}>
+                                {
+                                    props.taskForm.image && props.taskForm.image.name
+                                }
+                            </span>
+                            
+                            <input 
+                                type='file' 
+                                id='task-img-file' 
+                                style={{ display: 'none' }}
+                                onChange={e => {
+                                    let filesArray = e.target.files;
+                                    let file = filesArray[filesArray.length - 1];
+                                    props.setTaskForm({ ...props.taskForm, image: file });
+                                }} 
+                            />
+
                         </Form.Item>
 
                     </Form>
@@ -133,7 +164,7 @@ const TaskFormView = (props) => {
                     </div>
 
                     {
-                        sillables.map(el => {
+                        props.taskForm.syllables.map(el => {
                             
                             return(
                                 <span>
@@ -144,7 +175,7 @@ const TaskFormView = (props) => {
                                             cursor: 'pointer'
                                         }}
                                     >
-                                        {el.sillable.toUpperCase()}
+                                        {el.toUpperCase()}
                                     </Tag>
                                 </span>
                             )
@@ -159,13 +190,14 @@ const TaskFormView = (props) => {
                         style={{
                             marginRight: 10
                         }}
-                        onClick={() => props.openCloseSillableModal(true)}
+                        onClick={() => props.openCloseSyllableModal(true)}
                     >
                         Inserir sílaba
                     </Button>
 
                     <Button
                         type='primary'
+                        onClick={() => props.save()}
                     >
                         Salvar
                     </Button>

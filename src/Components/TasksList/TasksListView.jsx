@@ -18,13 +18,13 @@ const TasksListView = (props) => {
         },
         {
             title: 'Sílabas',
-            dataIndex: 'sillables',
-            key: 'sillables',
-            render: sillables => (
+            dataIndex: 'syllables',
+            key: 'syllables',
+            render: syllables => (
 
                 <span>
 
-                    {sillables.map(el => {
+                    {syllables.map(el => {
                         return(
                             <Tag color='green' key={el}>
                                 {el.toUpperCase()}
@@ -38,8 +38,8 @@ const TasksListView = (props) => {
         },
         {
             title: 'Criado em',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
+            dataIndex: '_createdAt',
+            key: '_createdAt',
         },
         {
             title: 'Ações',
@@ -65,27 +65,14 @@ const TasksListView = (props) => {
           },
     ];
 
-    // MOCK: datasource
-    const dataSource = [
-        {
-            key: '1',
-            name: 'Boca',
-            sillables: ['bo', 'ca'],
-            createdAt: '01/01/2021'
-        },
-        {
-            key: '2',
-            name: 'Casa',
-            sillables: ['ca', 'sa'],
-            createdAt: '01/01/2021'
-        },
-        {
-            key: '3',
-            name: 'Bonito',
-            sillables: ['bo', 'ni', 'to'],
-            createdAt: '01/01/2021'
+    const dataSource = props.tasks.map(el => {
+        return {
+            ...el,
+            name: el.name.toUpperCase(),
+            _createdAt: new Date(el._createdAt).toLocaleString('pt-BR'),
+            key: el._id
         }
-    ];
+    });
 
     return(
 
