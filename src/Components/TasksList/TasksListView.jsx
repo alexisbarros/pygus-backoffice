@@ -1,7 +1,8 @@
 import React from 'react';
 
 // Modules
-import { Card, Table, Tag, Space, Button, Breadcrumb } from 'antd';
+import { Card, Table, Tag, Space, Button, Breadcrumb, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 // Styles
@@ -57,6 +58,21 @@ const TasksListView = (props) => {
                         style={{ 
                             color: 'red',
                             cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                            
+                            Modal.confirm({
+                                title: 'Tem certeza que deseja cancelar essa tarefa?',
+                                icon: <ExclamationCircleOutlined />,
+                                content: 'Essa ação não poderá ser desfeita',
+                                okText: 'Sim',
+                                okType: 'danger',
+                                cancelText: 'Não',
+                                onOk() {
+                                    props.removeTask(record.key)
+                                },
+                            });
+
                         }}
                     >Deletar</span>
                 </Space>
@@ -120,7 +136,13 @@ const TasksListView = (props) => {
                         </Button>
                     </Link>
                     
-                    <Table dataSource={dataSource} columns={columns} />
+                    <Table 
+                        dataSource={dataSource} 
+                        columns={columns} 
+                        locale={{
+                            emptyText: 'Sem tarefas cadastradas'
+                        }}
+                    />
                 </Card>
 
             </div>
