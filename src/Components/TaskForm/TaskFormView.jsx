@@ -108,6 +108,7 @@ const TaskFormView = (props) => {
                             type='file' 
                             id='task-audio-file' 
                             style={{ display: 'none' }}
+                            accept="audio/mpeg3"
                             onChange={e => {
                                 let filesArray = e.target.files;
                                 let file = filesArray[filesArray.length - 1];
@@ -251,9 +252,6 @@ const TaskFormView = (props) => {
                                     <Tag 
                                         color='green' 
                                         key={el}
-                                        style={{
-                                            cursor: 'pointer'
-                                        }}
                                     >
                                         {el.toUpperCase()}
                                     </Tag>

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 // Modules
 import { Card, Table, Tag, Space, Button, Breadcrumb, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import env from '../../env.json';
 
 // Styles
 import './TasksListStyle.css';
@@ -21,21 +22,47 @@ const TasksListView = (props) => {
             title: 'Sílabas',
             dataIndex: 'syllables',
             key: 'syllables',
-            render: syllables => (
-
+            render: (syllables, row) => (
                 <span>
 
                     {syllables.map(el => {
                         return(
-                            <Tag color='green' key={el}>
-                                {el.toUpperCase()}
-                            </Tag>
+                            <Fragment>
+                                <Tag 
+                                    color='green' 
+                                    key={el}
+                                    style={{
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => {
+                                        document.getElementById(`audio-syllable-${row.originalName}-${el}`).play();
+                                    }}
+                                >
+                                    {el.toUpperCase()}
+                                </Tag>
+
+                                <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el}`}>
+                                    <source
+                                        src={`${env.server_public}/tasks_audios/${row.originalName}_${el}.mp3`}
+                                        type="audio/mpeg" 
+                                    />
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </Fragment>
                         )
                     })}
 
                 </span>
-
             )
+        },
+        {
+            title: 'Imagem',
+            dataIndex: 'image',
+            key: 'image',
+            align: 'center',
+            render: image => {
+                return <img src={image} width={40} height={40} alt='task' style={{ objectFit: 'contain' }} />
+            }
         },
         {
             title: 'Criado em',
@@ -49,10 +76,6 @@ const TasksListView = (props) => {
             render: (text, record) => (
                 
                 <Space size="middle">
-                
-                    <Link 
-                        to={`/home/task?id=${record.key}`}
-                    >Editar</Link>
                     
                     <span 
                         style={{ 
@@ -62,7 +85,7 @@ const TasksListView = (props) => {
                         onClick={() => {
                             
                             Modal.confirm({
-                                title: 'Tem certeza que deseja cancelar essa tarefa?',
+                                title: 'Tem certeza que deseja excluir essa tarefa?',
                                 icon: <ExclamationCircleOutlined />,
                                 content: 'Essa ação não poderá ser desfeita',
                                 okText: 'Sim',
@@ -85,8 +108,10 @@ const TasksListView = (props) => {
         return {
             ...el,
             name: el.name.toUpperCase(),
+            originalName: el.name,
             _createdAt: new Date(el._createdAt).toLocaleString('pt-BR'),
-            key: el._id
+            key: el._id,
+            image: `${env.server_public}/tasks_images/${el.name}`
         }
     });
 

@@ -3,12 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import jwt from 'jsonwebtoken';
+import env from './env.json';
 
 // Components
 import Login from './Components/Login/LoginContainer';
 import Home from './Components/Home/HomeContainer';
 import Cadastro from './Components/Cadastro/CadastroContainer';
 
+window.auth = (Component, props) => {
+  let token = sessionStorage.getItem('access_token') || localStorage.getItem('access_token') || '';
+  try {
+    jwt.verify(token, env.jwt_secret);
+    return <Component {...props} />
+  } catch(err){
+    return <Login {...props} />
+  }
+}
 
 ReactDOM.render(
   
@@ -18,9 +29,9 @@ ReactDOM.render(
     
       <Switch>
 
-        <Route path='/login' exact component={Login} />
-        <Route path='/home' component={Home} />
-        <Route path='/cadastro' component={Cadastro} />
+        <Route path='/' exact render={(props) => window.auth(Home, props)} />
+        <Route path='/home' render={(props) => window.auth(Home, props)} />
+        <Route path='/cadastro' component={(props) => window.auth(Cadastro, props)} />
 
 
       </Switch>

@@ -50,9 +50,10 @@ const TaskFormContainer = (props) => {
 
         // Changing the name of the image
         let image = taskForm.image;
-        let extensionString = image.type.split('/')[1];
+        // let extensionString = image.type.split('/')[1];
         let blob = image.slice(0, image.size, image.type); 
-        let imageWithNewName = new File([blob], `${taskForm.name}.${extensionString}`, { type: image.type });
+        // let imageWithNewName = new File([blob], `${taskForm.name}.${extensionString}`, { type: image.type });
+        let imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
         
         // Create form to save.
         let Form = new FormData();
@@ -78,9 +79,9 @@ const TaskFormContainer = (props) => {
             let AudioForm = new FormData();
             let audios = taskForm.audios;
             audios.forEach((el_audio, index_audio) => {
-                let audioExtensionString = el_audio.type.split('/')[1];
+                // let audioExtensionString = el_audio.type.split('/')[1];
                 let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type); 
-                let audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio]}.${audioExtensionString}`, { type: el_audio.type });
+                let audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio]}.mp3`, { type: el_audio.type });
                 AudioForm.append('audios', audioWithNewName);
             })
 

@@ -14,7 +14,11 @@ import TasksForm from '../TaskForm/TaskFormContainer';
 const { Header, Content, Sider } = Layout;
 
 const HomeView = (props) => {
-    props = props['parent_props'];
+    
+    props = {
+        ...props,
+        ...props['parent_props']
+    };
 
     return(
         
@@ -60,7 +64,10 @@ const HomeView = (props) => {
                             </Link>
                         </Menu.Item>
                         
-                        <Menu.Item key="3">
+                        <Menu.Item 
+                            key="3"
+                            onClick={() => props.logout()}
+                        >
                             Sair
                         </Menu.Item>
                     </Menu>
