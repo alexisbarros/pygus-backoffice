@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 // Modules
 import { message } from 'antd';
+import env from '../../env.json';
 
 // Components
 import TasksListView from './TasksListView';
@@ -15,7 +16,7 @@ const TasksListContainer = (props) => {
     const getTasks = async () => {
         
         // Call API
-        let apiResponse = await fetch('/tasks', 
+        let apiResponse = await fetch(`${env.api_url}/tasks`, 
         { 
             headers: {
                 'Accept': 'application/json',
@@ -52,7 +53,7 @@ const TasksListContainer = (props) => {
     const removeTask = async (id) => {
         
         // Call API
-        let apiResponse = await fetch(`/tasks/${id}`, 
+        let apiResponse = await fetch(`${env.api_url}/tasks/${id}`, 
         { 
             headers: {
                 'Accept': 'application/json',

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 // Modules
 import { message } from 'antd';
+import env from '../../env.json';
 
 // Components
 import TaskFormView from './TaskFormView';
@@ -62,7 +63,7 @@ const TaskFormContainer = (props) => {
         Form.append('syllables', JSON.stringify(taskForm.syllables));
         
         // Call API.
-        let apiResponse = await fetch('/tasks', 
+        let apiResponse = await fetch(`${env.api_url}/tasks`, 
         { 
             headers: {
                 'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
@@ -86,7 +87,7 @@ const TaskFormContainer = (props) => {
             })
 
             // Call API to put audios in server.
-            let audioApiResponse = await fetch(`/tasks/audios/${apiResponse.data._id}`, 
+            let audioApiResponse = await fetch(`${env.api_url}/tasks/audios/${apiResponse.data._id}`, 
             { 
                 headers: {
                     'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
