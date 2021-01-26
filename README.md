@@ -3,6 +3,9 @@
 Backoffice of the Pygus app developed with ReactJs.
 
 - [Screens](#screens)
+  - [Login](#login)
+  - [Task list](#task-list)
+  - [Task form](#task-form)
 - [Running the project](#running-the-project)
   - [Prerequisites](#prerequisites)
   - [Instalation](#instalation)
@@ -13,13 +16,19 @@ Backoffice of the Pygus app developed with ReactJs.
 - [/Endpoints](#endpoints)
 - [Authors](#authors)
 
-## Screems
+## Screens
 
-<img alt='Login' src="./src/assets/img/screens/screen_login.png">
+### Login
 
-<img alt='List' src="./src/assets/img/screens/screen_list.png">
+<img alt='Login' src="./src/assets/img/screens/screen_login.png" width="80%">
 
-<img alt='Form' src="./src/assets/img/screens/screen_form.png">
+### Task list
+
+<img alt='List' src="./src/assets/img/screens/screen_list.png" width="80%">
+
+### Task form
+
+<img alt='Form' src="./src/assets/img/screens/screen_form.png" width="80%">
 
 ## Running the project
 
@@ -93,4 +102,5 @@ Contains all the modules installed by NPM.
 ## Authors
 
 Alexis Barros - [github](https://github.com/alexisbarros)
+
 Rodrigo Ferreira - [github](https://github.com/rodlferreira)
