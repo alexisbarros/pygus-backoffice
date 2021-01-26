@@ -2,14 +2,6 @@
 
 Backoffice of the Pygus app developed with ReactJs.
 
-## Screems
-
-<img alt='Login' src="./assets/img/screens/screen_login.png" width="19%" style="margin-right: 1%;">
-
-<img alt='List' src="./assets/img/screens/screen_list.jpeg" width="19%" style="margin-right: 1%;">
-
-<img alt='Form' src="./assets/img/screens/screen_form.jpeg" width="19%" style="margin-right: 1%;">
-
 - [Screens](#screens)
 - [Running the project](#running-the-project)
   - [Prerequisites](#prerequisites)
@@ -20,6 +12,14 @@ Backoffice of the Pygus app developed with ReactJs.
   - [/node_modules](#node_modules)
 - [/Endpoints](#endpoints)
 - [Authors](#authors)
+
+## Screems
+
+<img alt='Login' src="./src/assets/img/screens/screen_login.png">
+
+<img alt='List' src="./src/assets/img/screens/screen_list.png">
+
+<img alt='Form' src="./src/assets/img/screens/screen_form.png">
 
 ## Running the project
 
