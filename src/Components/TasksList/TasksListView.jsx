@@ -4,7 +4,6 @@ import React, { Fragment } from 'react';
 import { Card, Table, Tag, Space, Button, Breadcrumb, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import env from '../../env.json';
 
 // Styles
 import './TasksListStyle.css';
@@ -25,7 +24,7 @@ const TasksListView = (props) => {
             render: (syllables, row) => (
                 <span>
 
-                    {syllables.map(el => {
+                    {syllables.map((el, index) => {
                         return(
                             <Fragment>
                                 <Tag 
@@ -42,8 +41,9 @@ const TasksListView = (props) => {
                                 </Tag>
 
                                 <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el}`}>
+                                    {console.log(row.audios[index])}
                                     <source
-                                        src={`${env.server_public}/tasks_audios/${row.originalName}_${el}.mp3`}
+                                        src={row.audios[index]}
                                         type="audio/mpeg" 
                                     />
                                     Your browser does not support the audio element.
@@ -105,13 +105,22 @@ const TasksListView = (props) => {
     ];
 
     const dataSource = props.tasks.map(el => {
+        // Get image
+        let base64Flag = `data:${el.imageType};base64,`;
+        let imageStr = props.arrayBufferToBase64(el.image.data.data);
+
+        // Get audios
+        let audiosBase64Flags = el.audios.map(audio => `data:${audio.type};base64,`);
+        let audiosStr = el.audios.map(audio => audio.data);
+
         return {
             ...el,
             name: el.name.toUpperCase(),
             originalName: el.name,
             _createdAt: new Date(el._createdAt).toLocaleString('pt-BR'),
             key: el._id,
-            image: `${env.server_public}/tasks_images/${el.name}`
+            image: base64Flag + imageStr,
+            audios: el.audios.map((audio, index) => `${audiosBase64Flags[index]}${audiosStr[index]}`)
         }
     });
 

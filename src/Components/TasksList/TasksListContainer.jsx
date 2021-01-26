@@ -77,12 +77,25 @@ const TasksListContainer = (props) => {
 
     }
 
+    /**
+     * Transform buffer to base64 to render a image from mongodb
+     * @param {*} buffer 
+     */
+    const arrayBufferToBase64 = (buffer) => {
+        var binary = '';
+        var bytes = [].slice.call(new Uint8Array(buffer));
+        bytes.forEach((b) => binary += String.fromCharCode(b));
+        return window.btoa(binary);
+    }
+
     return(
 
         <TasksListView
 
             tasks={tasks}
             removeTask={id => removeTask(id)}
+
+            arrayBufferToBase64={buffer => arrayBufferToBase64(buffer)}
 
         />
 
