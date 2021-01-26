@@ -1,70 +1,96 @@
-# Getting Started with Create React App
+# Pygus Backoffice
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Backoffice of the Pygus app developed with ReactJs.
 
-## Available Scripts
+## Screems
 
-In the project directory, you can run:
+<img alt='Login' src="./assets/img/screens/screen_login.png" width="19%" style="margin-right: 1%;">
 
-### `yarn start`
+<img alt='List' src="./assets/img/screens/screen_list.jpeg" width="19%" style="margin-right: 1%;">
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<img alt='Form' src="./assets/img/screens/screen_form.jpeg" width="19%" style="margin-right: 1%;">
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- [Screens](#screens)
+- [Running the project](#running-the-project)
+  - [Prerequisites](#prerequisites)
+  - [Instalation](#instalation)
+  - [Start](#start)
+- [Project structure](#project-structure)
+  - [/Components](#Components)
+  - [/node_modules](#node_modules)
+- [/Endpoints](#endpoints)
+- [Authors](#authors)
 
-### `yarn test`
+## Running the project
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Follow the instructions below to copy the project and run locally.
 
-### `yarn build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+As prerequisites to run the project is needed to have Node.js and the package manager NPM installed in you machine.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The backend server needs to be runing too. The backend repo can be access [here](https://github.com/alexisbarros/pygus-api.git).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Instalation
 
-### `yarn eject`
+Clone the project with the command:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```sh
+$ git clone https://github.com/alexisbarros/pygus-backoffice.git
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Go to the created folder:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```sh
+$ cd pygus-backoffice
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Install all dependencies:
 
-## Learn More
+```sh
+$ npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Start
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+With backend server runing, start the project using:
 
-### Code Splitting
+```sh
+$ npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Project structure
 
-### Analyzing the Bundle Size
+The project is structured as follows:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```
+pygus-backoffice/
+  public/
+  node_modules/
+  src/
+    Components/
+      Home/
+      Login/
+      TaskForm/
+      TaskList/
+    env.json
+    index.js
+    index.css
+  package.json
+  README.md
+```
 
-### Making a Progressive Web App
+Below is a breakdown of some project directories.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### /src/Components
 
-### Advanced Configuration
+Contains all components of the project.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### /node_modules
 
-### Deployment
+Contains all the modules installed by NPM.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Authors
 
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Alexis Barros - [github](https://github.com/alexisbarros)
+Rodrigo Ferreira - [github](https://github.com/rodlferreira)
