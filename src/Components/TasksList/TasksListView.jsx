@@ -25,10 +25,10 @@ const TasksListView = (props) => {
                 <span>
 
                     {syllables.map((el, index) => {
-                        return(
+                        return (
                             <Fragment>
-                                <Tag 
-                                    color='green' 
+                                <Tag
+                                    color={el.isPhoneme ? 'green' : 'default'}
                                     key={el}
                                     style={{
                                         cursor: 'pointer'
@@ -37,14 +37,14 @@ const TasksListView = (props) => {
                                         document.getElementById(`audio-syllable-${row.originalName}-${el}`).play();
                                     }}
                                 >
-                                    {el.toUpperCase()}
+                                    {el.syllable.toUpperCase()}
                                 </Tag>
 
                                 <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el}`}>
                                     {console.log(row.audios[index])}
                                     <source
                                         src={row.audios[index]}
-                                        type="audio/mpeg" 
+                                        type="audio/mpeg"
                                     />
                                     Your browser does not support the audio element.
                                 </audio>
@@ -74,16 +74,16 @@ const TasksListView = (props) => {
             key: 'actions',
             width: 100,
             render: (text, record) => (
-                
+
                 <Space size="middle">
-                    
-                    <span 
-                        style={{ 
+
+                    <span
+                        style={{
                             color: 'red',
                             cursor: 'pointer'
                         }}
                         onClick={() => {
-                            
+
                             Modal.confirm({
                                 title: 'Tem certeza que deseja excluir essa tarefa?',
                                 icon: <ExclamationCircleOutlined />,
@@ -99,9 +99,9 @@ const TasksListView = (props) => {
                         }}
                     >Deletar</span>
                 </Space>
-            
+
             ),
-          },
+        },
     ];
 
     const dataSource = props.tasks.map(el => {
@@ -124,7 +124,7 @@ const TasksListView = (props) => {
         }
     });
 
-    return(
+    return (
 
         <div
             style={{
@@ -169,10 +169,10 @@ const TasksListView = (props) => {
                             Adicionar tarefa
                         </Button>
                     </Link>
-                    
-                    <Table 
-                        dataSource={dataSource} 
-                        columns={columns} 
+
+                    <Table
+                        dataSource={dataSource}
+                        columns={columns}
                         locale={{
                             emptyText: 'Sem tarefas cadastradas'
                         }}

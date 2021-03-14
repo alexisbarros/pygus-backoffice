@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Modules
-import { Card, Breadcrumb, Form, Input, Button, Divider, Tag, Modal, message } from 'antd';
+import { Card, Breadcrumb, Form, Input, Button, Divider, Tag, Modal, message, Checkbox } from 'antd';
 import { Link } from 'react-router-dom';
 import { UploadOutlined, DeleteOutlined, SoundOutlined } from '@ant-design/icons';
 
@@ -23,16 +23,16 @@ const TaskFormView = (props) => {
                 visible={props.syllableModal}
                 title='Adicionar uma sílaba'
                 onOk={() => {
-                    if(props.syllableToPush && props.audioToPush){
+                    if (props.syllableToPush && props.audioToPush) {
 
                         let syllablesArray = props.taskForm.syllables;
                         syllablesArray.push(props.syllableToPush);
-                        
+
                         let audiosArray = props.taskForm.audios;
                         audiosArray.push(props.audioToPush);
 
                         props.setTaskForm({ ...props.taskForm, syllables: syllablesArray, audios: audiosArray });
-                        props.setSyllableToPush('');
+                        props.setSyllableToPush({ syllable: '', isPhoneme: false, });
                         props.setAudioToPush('');
                         props.openCloseSyllableModal(false);
 
@@ -47,21 +47,38 @@ const TaskFormView = (props) => {
                 <Form
                     layout='vertical'
                 >
-                    
+
                     <Form.Item
                         label="Sílaba"
                     >
-                        <Input 
-                            value={props.syllableToPush}
-                            onChange={e => props.setSyllableToPush(e.target.value) }
+                        <Input
+                            value={props.syllableToPush.syllable}
+                            onChange={e => {
+                                props.setSyllableToPush({
+                                    ...props.syllableToPush,
+                                    syllable: e.target.value
+                                })
+                            }}
                         />
+                    </Form.Item>
+
+                    <Form.Item>
+                        <Checkbox
+                            checked={props.syllableToPush.isPhoneme}
+                            onChange={e => {
+                                props.setSyllableToPush({
+                                    ...props.syllableToPush,
+                                    isPhoneme: e.target.checked,
+                                })
+                            }}
+                        >Fonema</Checkbox>
                     </Form.Item>
 
                     <Form.Item
                         label="Áudio"
                     >
-                        
-                        <Button 
+
+                        <Button
                             icon={<UploadOutlined />}
                             onClick={() => document.getElementById('task-audio-file').click()}
                             style={{ marginBottom: '10px' }}
@@ -71,13 +88,13 @@ const TaskFormView = (props) => {
 
                         {
                             props.audioToPush ?
-                                <Card 
-                                    style={{ 
-                                        color: '#6495ED', 
+                                <Card
+                                    style={{
+                                        color: '#6495ED',
                                         fontSize: 12,
                                     }}
                                 >
-                                    <SoundOutlined 
+                                    <SoundOutlined
                                         style={{
                                             fontSize: 20,
                                             marginRight: 20,
@@ -86,14 +103,14 @@ const TaskFormView = (props) => {
                                     />
 
                                     {props.audioToPush.name}
-                                    
+
                                     <div
                                         style={{
                                             float: 'right',
                                         }}
                                     >
-                                        <DeleteOutlined 
-                                            style={{ 
+                                        <DeleteOutlined
+                                            style={{
                                                 color: 'red',
                                                 cursor: 'pointer',
                                                 fontSize: 14,
@@ -104,9 +121,9 @@ const TaskFormView = (props) => {
                                 </Card> : null
                         }
 
-                        <input 
-                            type='file' 
-                            id='task-audio-file' 
+                        <input
+                            type='file'
+                            id='task-audio-file'
                             style={{ display: 'none' }}
                             accept="audio/mpeg3"
                             onChange={e => {
@@ -115,7 +132,7 @@ const TaskFormView = (props) => {
 
                                 // Set audio to push
                                 props.setAudioToPush(file);
-                            }} 
+                            }}
                         />
                     </Form.Item>
 
@@ -138,11 +155,11 @@ const TaskFormView = (props) => {
                         <Breadcrumb.Item>
                             <Link to='/home'>Início</Link>
                         </Breadcrumb.Item>
-                        
+
                         <Breadcrumb.Item>
                             <Link to='/home/task'>Lista de Tarefas</Link>
                         </Breadcrumb.Item>
-                        
+
                         <Breadcrumb.Item>
                             Tarefa
                         </Breadcrumb.Item>
@@ -153,7 +170,7 @@ const TaskFormView = (props) => {
                         style={{ marginTop: 40 }}
                         layout='vertical'
                     >
-                        
+
                         <Form.Item
                             label="Nome"
                             style={{ width: 500 }}
@@ -167,8 +184,8 @@ const TaskFormView = (props) => {
                         <Form.Item
                             label="Imagem"
                         >
-                            
-                            <Button 
+
+                            <Button
                                 icon={<UploadOutlined />}
                                 onClick={() => document.getElementById('task-img-file').click()}
                                 style={{ marginBottom: '10px' }}
@@ -178,13 +195,13 @@ const TaskFormView = (props) => {
 
                             {
                                 props.taskForm.image ?
-                                    <Card 
-                                        style={{ 
-                                            color: '#6495ED', 
-                                            fontSize: 12 
+                                    <Card
+                                        style={{
+                                            color: '#6495ED',
+                                            fontSize: 12
                                         }}
                                     >
-                                        <img 
+                                        <img
                                             alt='thumb'
                                             id='task-img-file-thumb'
                                             style={{
@@ -193,15 +210,15 @@ const TaskFormView = (props) => {
                                             }}
                                         />
                                         {props.taskForm.image.name}
-                                        
+
                                         <div
                                             style={{
                                                 float: 'right',
                                                 lineHeight: 5
                                             }}
                                         >
-                                            <DeleteOutlined 
-                                                style={{ 
+                                            <DeleteOutlined
+                                                style={{
                                                     color: 'red',
                                                     cursor: 'pointer',
                                                     fontSize: 14,
@@ -211,10 +228,10 @@ const TaskFormView = (props) => {
                                         </div>
                                     </Card> : null
                             }
-                            
-                            <input 
-                                type='file' 
-                                id='task-img-file' 
+
+                            <input
+                                type='file'
+                                id='task-img-file'
                                 style={{ display: 'none' }}
                                 onChange={e => {
                                     let filesArray = e.target.files;
@@ -229,7 +246,7 @@ const TaskFormView = (props) => {
                                     fileReader.onload = function (oFREvent) {
                                         document.getElementById("task-img-file-thumb").src = oFREvent.target.result;
                                     };
-                                }} 
+                                }}
                             />
 
                         </Form.Item>
@@ -246,14 +263,14 @@ const TaskFormView = (props) => {
 
                     {
                         props.taskForm.syllables.map(el => {
-                            
-                            return(
+
+                            return (
                                 <span>
-                                    <Tag 
-                                        color='green' 
+                                    <Tag
+                                        color={el.isPhoneme ? 'green' : 'default'}
                                         key={el}
                                     >
-                                        {el.toUpperCase()}
+                                        {el.syllable.toUpperCase()}
                                     </Tag>
                                 </span>
                             )
@@ -261,9 +278,9 @@ const TaskFormView = (props) => {
                     }
 
                     <br />
-                    
+
                     <Divider />
-                    
+
                     <Button
                         style={{
                             marginRight: 10

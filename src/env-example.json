@@ -1,0 +1,4 @@
+{
+    "api_url": "localhost:4200",
+    "jwt_secret": ""
+}
