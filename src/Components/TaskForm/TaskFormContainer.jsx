@@ -12,14 +12,57 @@ const TaskFormContainer = (props) => {
     props = props.parent_props;
 
     useEffect(() => {
+        const getTask = async () => {
 
-        const getTask = async (id) => {
+            if (props.location.pathname.includes('/home/task/edit/')) {
+                const id = props.location.pathname.split('/')[4];
 
+                // Call API
+                let apiResponse = await fetch(`${env.api_url}/tasks/${id}`,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
+                        },
+                        method: 'GET',
+                    });
+                apiResponse = await apiResponse.json();
+
+                // Check if response was successfuly
+                if (apiResponse.code === 200) {
+
+                    console.log(apiResponse.data);
+                    setTaskForm({
+                        name: apiResponse.data.name,
+                        image: apiResponse.data.image,
+                        syllables: apiResponse.data.syllables,
+                        audios: apiResponse.data.audios,
+                    })
+                    document.getElementById("task-img-file-thumb").src = `data:image/png;base64,${arrayBufferToBase64(apiResponse.data.image.data.data)}`
+
+                } else {
+
+                    message.error(apiResponse.message);
+
+                }
+            }
         };
 
         getTask();
 
     }, []);
+
+    /**
+     * Transform buffer to base64 to render a image from mongodb
+     * @param {*} buffer 
+     */
+    const arrayBufferToBase64 = (buffer) => {
+        var binary = '';
+        var bytes = [].slice.call(new Uint8Array(buffer));
+        bytes.forEach((b) => binary += String.fromCharCode(b));
+        return window.btoa(binary);
+    }
 
     /**
      * Open and close syllable modal
@@ -51,10 +94,11 @@ const TaskFormContainer = (props) => {
 
         // Changing the name of the image
         let image = taskForm.image;
-        // let extensionString = image.type.split('/')[1];
-        let blob = image.slice(0, image.size, image.type);
-        // let imageWithNewName = new File([blob], `${taskForm.name}.${extensionString}`, { type: image.type });
-        let imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
+        let imageWithNewName = image;
+        if (!image.data) {
+            let blob = image.slice(0, image.size, image.type);
+            imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
+        }
 
         // Create form to save.
         let Form = new FormData();
@@ -63,12 +107,21 @@ const TaskFormContainer = (props) => {
         Form.append('syllables', JSON.stringify(taskForm.syllables));
 
         // Call API.
-        let apiResponse = await fetch(`${env.api_url}/tasks`,
+        let endpoint = `${env.api_url}/tasks`;
+        let method = 'POST';
+        let methodDescription = 'criada'
+        if (props.location.pathname.includes('/home/task/edit/')) {
+            let id = props.location.pathname.split('/')[4];
+            endpoint = `${env.api_url}/tasks/${id}`;
+            method = 'PUT';
+            methodDescription = 'atualizada';
+        }
+        let apiResponse = await fetch(endpoint,
             {
                 headers: {
                     'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
                 },
-                method: 'POST',
+                method: method,
                 body: Form
             });
         apiResponse = await apiResponse.json();
@@ -80,9 +133,11 @@ const TaskFormContainer = (props) => {
             let AudioForm = new FormData();
             let audios = taskForm.audios;
             audios.forEach((el_audio, index_audio) => {
-                // let audioExtensionString = el_audio.type.split('/')[1];
-                let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
-                let audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio]}.mp3`, { type: el_audio.type });
+                let audioWithNewName = el_audio;
+                if (!el_audio.data) {
+                    let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
+                    audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio].syllable}.mp3`, { type: el_audio.type });
+                }
                 AudioForm.append('audios', audioWithNewName);
             })
 
@@ -99,7 +154,7 @@ const TaskFormContainer = (props) => {
 
             if (audioApiResponse.code === 200) {
 
-                message.success('Tarefa criada com sucesso');
+                message.success(`Tarefa ${methodDescription} com sucesso`);
                 setLoadingSaveButton(false);
                 props.history.push('/home/task');
 

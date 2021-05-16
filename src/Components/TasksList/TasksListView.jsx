@@ -34,14 +34,13 @@ const TasksListView = (props) => {
                                         cursor: 'pointer'
                                     }}
                                     onClick={() => {
-                                        document.getElementById(`audio-syllable-${row.originalName}-${el}`).play();
+                                        document.getElementById(`audio-syllable-${row.originalName}-${el.syllable}`).play();
                                     }}
                                 >
                                     {el.syllable.toUpperCase()}
                                 </Tag>
 
-                                <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el}`}>
-                                    {console.log(row.audios[index])}
+                                <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el.syllable}`}>
                                     <source
                                         src={row.audios[index]}
                                         type="audio/mpeg"
@@ -76,6 +75,8 @@ const TasksListView = (props) => {
             render: (text, record) => (
 
                 <Space size="middle">
+
+                    <Link to={`/home/task/edit/${record.key}`}>Editar</Link>
 
                     <span
                         style={{
@@ -173,6 +174,7 @@ const TasksListView = (props) => {
                     <Table
                         dataSource={dataSource}
                         columns={columns}
+                        loading={props.loading}
                         locale={{
                             emptyText: 'Sem tarefas cadastradas'
                         }}

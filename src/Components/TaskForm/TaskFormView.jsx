@@ -3,6 +3,7 @@ import React from 'react';
 // Modules
 import { Card, Breadcrumb, Form, Input, Button, Divider, Tag, Modal, message, Checkbox } from 'antd';
 import { Link } from 'react-router-dom';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { UploadOutlined, DeleteOutlined, SoundOutlined } from '@ant-design/icons';
 
 // Style
@@ -262,13 +263,35 @@ const TaskFormView = (props) => {
                     </div>
 
                     {
-                        props.taskForm.syllables.map(el => {
+                        props.taskForm.syllables.map((el, i) => {
 
                             return (
                                 <span>
                                     <Tag
                                         color={el.isPhoneme ? 'green' : 'default'}
                                         key={el}
+                                        style={{
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => {
+                                            Modal.confirm({
+                                                title: 'Deseja excluir essa silaba?',
+                                                icon: <ExclamationCircleOutlined />,
+                                                content: 'Essa ação não poderá ser desfeita',
+                                                okText: 'Sim',
+                                                okType: 'danger',
+                                                cancelText: 'Não',
+                                                onOk() {
+                                                    let syllablesArray = props.taskForm.syllables;
+                                                    syllablesArray.splice(i, 1);
+
+                                                    let audiosArray = props.taskForm.audios;
+                                                    audiosArray.splice(i, 1);
+
+                                                    props.setTaskForm({ ...props.taskForm, syllables: syllablesArray, audios: audiosArray });
+                                                },
+                                            });
+                                        }}
                                     >
                                         {el.syllable.toUpperCase()}
                                     </Tag>
