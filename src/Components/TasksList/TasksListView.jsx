@@ -39,14 +39,6 @@ const TasksListView = (props) => {
                                 >
                                     {el.syllable.toUpperCase()}
                                 </Tag>
-
-                                <audio controls style={{ display: 'none' }} id={`audio-syllable-${row.originalName}-${el.syllable}`}>
-                                    <source
-                                        src={row.audios[index]}
-                                        type="audio/mpeg"
-                                    />
-                                    Your browser does not support the audio element.
-                                </audio>
                             </Fragment>
                         )
                     })}
@@ -55,13 +47,10 @@ const TasksListView = (props) => {
             )
         },
         {
-            title: 'Imagem',
-            dataIndex: 'image',
-            key: 'image',
-            align: 'center',
-            render: image => {
-                return <img src={image} width={40} height={40} alt='task' style={{ objectFit: 'contain' }} />
-            }
+            title: 'Fonema',
+            dataIndex: 'phoneme',
+            key: 'phoneme',
+            sorter: (a, b) => (a.phoneme > b.phoneme) ? 1 : ((b.phoneme > a.phoneme) ? -1 : 0),
         },
         {
             title: 'Criado em',
@@ -106,22 +95,14 @@ const TasksListView = (props) => {
     ];
 
     const dataSource = props.tasks.map(el => {
-        // Get image
-        let base64Flag = `data:${el.imageType};base64,`;
-        let imageStr = props.arrayBufferToBase64(el.image.data.data);
-
-        // Get audios
-        let audiosBase64Flags = el.audios.map(audio => `data:${audio.type};base64,`);
-        let audiosStr = el.audios.map(audio => audio.data);
 
         return {
             ...el,
             name: el.name.toUpperCase(),
             originalName: el.name,
+            phoneme: el.phoneme,
             _createdAt: new Date(el._createdAt).toLocaleString('pt-BR'),
             key: el._id,
-            image: base64Flag + imageStr,
-            audios: el.audios.map((audio, index) => `${audiosBase64Flags[index]}${audiosStr[index]}`)
         }
     });
 

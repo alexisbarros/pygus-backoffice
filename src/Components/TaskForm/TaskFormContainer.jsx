@@ -82,7 +82,7 @@ const TaskFormContainer = (props) => {
     /**
      * Set form.
      */
-    const [taskForm, setTaskForm] = useState({ name: '', image: '', syllables: [], audios: [] });
+    const [taskForm, setTaskForm] = useState({ name: '', image: '', syllables: [], audios: [], phoneme: '', completeWordAudio: '' });
 
     /**
      * Save task.
@@ -103,6 +103,7 @@ const TaskFormContainer = (props) => {
         // Create form to save.
         let Form = new FormData();
         Form.append('name', taskForm.name);
+        Form.append('phoneme', taskForm.phoneme);
         Form.append('image', imageWithNewName);
         Form.append('syllables', JSON.stringify(taskForm.syllables));
 
@@ -154,9 +155,39 @@ const TaskFormContainer = (props) => {
 
             if (audioApiResponse.code === 200) {
 
-                message.success(`Tarefa ${methodDescription} com sucesso`);
-                setLoadingSaveButton(false);
-                props.history.push('/home/task');
+                // Changing the name of the complete audio
+                let CompleteAudioForm = new FormData();
+                let audio = taskForm.completeWordAudio;
+                let completeAudioWithNewName = audio;
+                if (!audio.data) {
+                    let completeAudioBlob = audio.slice(0, audio.size, audio.type);
+                    completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name}.mp3`, { type: audio.type });
+                }
+                CompleteAudioForm.append('image', completeAudioWithNewName);
+
+                // Call API to put complete audio in server.
+                let completeAudioApiResponse = await fetch(`${env.api_url}/tasks/complete_word_audio/${apiResponse.data._id}`,
+                    {
+                        headers: {
+                            'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
+                        },
+                        method: 'PUT',
+                        body: CompleteAudioForm
+                    });
+                completeAudioApiResponse = await completeAudioApiResponse.json();
+
+                if (completeAudioApiResponse.code === 200) {
+
+                    message.success(`Tarefa ${methodDescription} com sucesso`);
+                    setLoadingSaveButton(false);
+                    props.history.push('/home/task');
+
+                } else {
+
+                    setLoadingSaveButton(false);
+                    message.error(audioApiResponse.message);
+
+                }
 
             } else {
 

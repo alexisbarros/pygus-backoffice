@@ -252,6 +252,76 @@ const TaskFormView = (props) => {
 
                         </Form.Item>
 
+                        <Form.Item
+                            label="Fonema"
+                            style={{ width: 100 }}
+                        >
+                            <Input
+                                value={props.taskForm.phoneme}
+                                onChange={e => props.setTaskForm({ ...props.taskForm, phoneme: e.target.value })}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Áudio da palavra (completa)"
+                        >
+
+                            <Button
+                                icon={<UploadOutlined />}
+                                onClick={() => document.getElementById('task-complete-audio-file').click()}
+                                style={{ marginBottom: '10px' }}
+                            >
+                                Enviar áudio
+                            </Button><br />
+
+                            {
+                                props.taskForm.completeWordAudio ?
+                                    <Card
+                                        style={{
+                                            color: '#6495ED',
+                                            fontSize: 12,
+                                        }}
+                                    >
+                                        <SoundOutlined
+                                            style={{
+                                                fontSize: 20,
+                                                marginRight: 20,
+                                                color: 'black'
+                                            }}
+                                        />
+
+                                        {props.taskForm.completeWordAudio.name}
+
+                                        <div
+                                            style={{
+                                                float: 'right',
+                                            }}
+                                        >
+                                            <DeleteOutlined
+                                                style={{
+                                                    color: 'red',
+                                                    cursor: 'pointer',
+                                                    fontSize: 14,
+                                                }}
+                                                onClick={() => props.setTaskForm({ ...props.taskForm, completeWordAudio: '' })}
+                                            />
+                                        </div>
+                                    </Card> : null
+                            }
+
+                            <input
+                                type='file'
+                                id='task-complete-audio-file'
+                                style={{ display: 'none' }}
+                                accept="audio/mpeg3"
+                                onChange={e => {// Set complete audio in form
+                                    let filesArray = e.target.files;
+                                    let file = filesArray[filesArray.length - 1];
+                                    props.setTaskForm({ ...props.taskForm, completeWordAudio: file });
+                                }}
+                            />
+                        </Form.Item>
+
                     </Form>
 
                     <div
