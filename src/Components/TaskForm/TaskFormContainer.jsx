@@ -31,15 +31,17 @@ const TaskFormContainer = (props) => {
 
                 // Check if response was successfuly
                 if (apiResponse.code === 200) {
-
                     console.log(apiResponse.data);
                     setTaskForm({
                         name: apiResponse.data.name,
+                        phoneme: apiResponse.data.phoneme,
                         image: apiResponse.data.image,
                         syllables: apiResponse.data.syllables,
                         audios: apiResponse.data.audios,
+                        completeWordAudio: apiResponse.data.completeWordAudio,
                     })
                     document.getElementById("task-img-file-thumb").src = `data:image/png;base64,${arrayBufferToBase64(apiResponse.data.image.data.data)}`
+                    if (apiResponse.data.completeWordAudio.data) document.getElementById("task-complete-audio-file").src = `data:audio/mpeg3;base64,${arrayBufferToBase64(apiResponse.data.completeWordAudio.data.data)}`
 
                 } else {
 
@@ -89,7 +91,6 @@ const TaskFormContainer = (props) => {
      */
     const [loadingSaveButton, setLoadingSaveButton] = useState(false);
     const save = async () => {
-
         setLoadingSaveButton(true);
 
         // Changing the name of the image
@@ -104,7 +105,7 @@ const TaskFormContainer = (props) => {
         let Form = new FormData();
         Form.append('name', taskForm.name);
         Form.append('phoneme', taskForm.phoneme);
-        Form.append('image', imageWithNewName);
+        if (!image.data) Form.append('image', imageWithNewName);
         Form.append('syllables', JSON.stringify(taskForm.syllables));
 
         // Call API.
@@ -138,8 +139,8 @@ const TaskFormContainer = (props) => {
                 if (!el_audio.data) {
                     let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
                     audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio].syllable}.mp3`, { type: el_audio.type });
+                    AudioForm.append('audios', audioWithNewName);
                 }
-                AudioForm.append('audios', audioWithNewName);
             })
 
             // Call API to put audios in server.
@@ -162,32 +163,37 @@ const TaskFormContainer = (props) => {
                 if (!audio.data) {
                     let completeAudioBlob = audio.slice(0, audio.size, audio.type);
                     completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name}.mp3`, { type: audio.type });
-                }
-                CompleteAudioForm.append('image', completeAudioWithNewName);
+                    CompleteAudioForm.append('image', completeAudioWithNewName);
 
-                // Call API to put complete audio in server.
-                let completeAudioApiResponse = await fetch(`${env.api_url}/tasks/complete_word_audio/${apiResponse.data._id}`,
-                    {
-                        headers: {
-                            'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
-                        },
-                        method: 'PUT',
-                        body: CompleteAudioForm
-                    });
-                completeAudioApiResponse = await completeAudioApiResponse.json();
+                    // Call API to put complete audio in server.
+                    let completeAudioApiResponse = await fetch(`${env.api_url}/tasks/complete_word_audio/${apiResponse.data._id}`,
+                        {
+                            headers: {
+                                'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
+                            },
+                            method: 'PUT',
+                            body: CompleteAudioForm
+                        });
+                    completeAudioApiResponse = await completeAudioApiResponse.json();
 
-                if (completeAudioApiResponse.code === 200) {
+                    if (completeAudioApiResponse.code === 200) {
 
+                        message.success(`Tarefa ${methodDescription} com sucesso`);
+                        setLoadingSaveButton(false);
+                        props.history.push('/home/task');
+
+                    } else {
+
+                        setLoadingSaveButton(false);
+                        message.error(audioApiResponse.message);
+
+                    }
+                } else {
                     message.success(`Tarefa ${methodDescription} com sucesso`);
                     setLoadingSaveButton(false);
                     props.history.push('/home/task');
-
-                } else {
-
-                    setLoadingSaveButton(false);
-                    message.error(audioApiResponse.message);
-
                 }
+
 
             } else {
 
