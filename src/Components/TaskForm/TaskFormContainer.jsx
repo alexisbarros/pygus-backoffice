@@ -93,21 +93,24 @@ const TaskFormContainer = (props) => {
     const save = async () => {
         setLoadingSaveButton(true);
 
-        // Changing the name of the image
-        let image = taskForm.image;
-        let imageWithNewName = image;
-        if (!image.data) {
-            let blob = image.slice(0, image.size, image.type);
-            imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
-        }
+        // // Changing the name of the image
+        // let image = taskForm.image;
+        // let imageWithNewName = image;
+        // if (!image.data) {
+        //     let blob = image.slice(0, image.size, image.type);
+        //     imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
+        // }
 
         // Create form to save.
-        let Form = new FormData();
-        Form.append('name', taskForm.name);
-        Form.append('phoneme', taskForm.phoneme);
-        if (!image.data) Form.append('image', imageWithNewName);
-        Form.append('syllables', JSON.stringify(taskForm.syllables));
-
+        let Form = {};
+        // Form.append('name', taskForm.name);
+        // Form.append('phoneme', taskForm.phoneme);
+        // if (!image.data) Form.append('image', imageWithNewName);
+        // Form.append('syllables', JSON.stringify(taskForm.syllables));
+        Form['name'] = taskForm.name;
+        Form['phoneme'] = taskForm.phoneme;
+        Form['syllables'] = JSON.stringify(taskForm.syllables);
+        console.log(Form);
         // Call API.
         let endpoint = `${env.api_url}/tasks`;
         let method = 'POST';
@@ -121,10 +124,11 @@ const TaskFormContainer = (props) => {
         let apiResponse = await fetch(endpoint,
             {
                 headers: {
-                    'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
+                    'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token'),
+                    'Content-Type': 'application/json',
                 },
                 method: method,
-                body: Form
+                body: JSON.stringify(Form)
             });
         apiResponse = await apiResponse.json();
 
@@ -138,7 +142,7 @@ const TaskFormContainer = (props) => {
                 let audioWithNewName = el_audio;
                 if (!el_audio.data) {
                     let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
-                    audioWithNewName = new File([audioBlob], `${taskForm.name}_${taskForm.syllables[index_audio].syllable}.mp3`, { type: el_audio.type });
+                    audioWithNewName = new File([audioBlob], `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}_${taskForm.syllables[index_audio].syllable.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.mp3`, { type: el_audio.type });
                     AudioForm.append('audios', audioWithNewName);
                 }
             })
@@ -162,7 +166,7 @@ const TaskFormContainer = (props) => {
                 let completeAudioWithNewName = audio;
                 if (!audio.data) {
                     let completeAudioBlob = audio.slice(0, audio.size, audio.type);
-                    completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name}.mp3`, { type: audio.type });
+                    completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.mp3`, { type: audio.type });
                     CompleteAudioForm.append('image', completeAudioWithNewName);
 
                     // Call API to put complete audio in server.

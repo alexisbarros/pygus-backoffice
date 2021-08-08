@@ -182,7 +182,7 @@ const TaskFormView = (props) => {
                             />
                         </Form.Item>
 
-                        <Form.Item
+                        {/* <Form.Item
                             label="Imagem"
                         >
 
@@ -250,7 +250,7 @@ const TaskFormView = (props) => {
                                 }}
                             />
 
-                        </Form.Item>
+                        </Form.Item> */}
 
                         <Form.Item
                             label="Fonema"
@@ -386,7 +386,7 @@ const TaskFormView = (props) => {
                     <Button
                         type='primary'
                         disabled={
-                            !props.taskForm.name || !props.taskForm.image || (props.taskForm.syllables.length === 0)
+                            !props.taskForm.name || (props.taskForm.syllables.length === 0)
                         }
                         onClick={() => props.save()}
                         loading={props.loadingSaveButton}
