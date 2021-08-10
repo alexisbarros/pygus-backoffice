@@ -51,6 +51,13 @@ const TasksListView = (props) => {
             dataIndex: 'phoneme',
             key: 'phoneme',
             sorter: (a, b) => (a.phoneme > b.phoneme) ? 1 : ((b.phoneme > a.phoneme) ? -1 : 0),
+            filters: [...new Set(props.tasks.map(el => el['phoneme']))].map(el => {
+                return {
+                    text: el,
+                    value: el,
+                };
+            }),
+            onFilter: (value, record) => record.phoneme.indexOf(value) === 0,
         },
         {
             title: 'Criado em',
@@ -95,7 +102,6 @@ const TasksListView = (props) => {
     ];
 
     const dataSource = props.tasks.map(el => {
-
         return {
             ...el,
             name: el.name.toUpperCase(),

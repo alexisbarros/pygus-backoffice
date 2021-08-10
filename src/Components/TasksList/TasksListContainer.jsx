@@ -18,7 +18,7 @@ const TasksListContainer = (props) => {
 
         setLoading(true);
         // Call API
-        let apiResponse = await fetch(`${env.api_url}/tasks`,
+        let apiResponse = await fetch(`${env.api_url}/tasks/backoffice`,
             {
                 headers: {
                     'Accept': 'application/json',
