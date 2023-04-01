@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 // Modules
 import { message } from 'antd';
-import env from '../../env.json';
 
 // Components
 import TaskFormView from './TaskFormView';
@@ -18,7 +17,7 @@ const TaskFormContainer = (props) => {
                 const id = props.location.pathname.split('/')[4];
 
                 // Call API
-                let apiResponse = await fetch(`${env.api_url}/tasks/${id}`,
+                let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/${id}`,
                     {
                         headers: {
                             'Accept': 'application/json',
@@ -53,7 +52,7 @@ const TaskFormContainer = (props) => {
 
         getTask();
 
-    }, []);
+    });
 
     /**
      * Transform buffer to base64 to render a image from mongodb
@@ -112,12 +111,12 @@ const TaskFormContainer = (props) => {
         Form['syllables'] = JSON.stringify(taskForm.syllables);
         console.log(Form);
         // Call API.
-        let endpoint = `${env.api_url}/tasks`;
+        let endpoint = `${process.env.REACT_APP_API_URL}/tasks`;
         let method = 'POST';
         let methodDescription = 'criada'
         if (props.location.pathname.includes('/home/task/edit/')) {
             let id = props.location.pathname.split('/')[4];
-            endpoint = `${env.api_url}/tasks/${id}`;
+            endpoint = `${process.env.REACT_APP_API_URL}/tasks/${id}`;
             method = 'PUT';
             methodDescription = 'atualizada';
         }
@@ -148,7 +147,7 @@ const TaskFormContainer = (props) => {
             })
 
             // Call API to put audios in server.
-            let audioApiResponse = await fetch(`${env.api_url}/tasks/audios/${apiResponse.data._id}`,
+            let audioApiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/audios/${apiResponse.data._id}`,
                 {
                     headers: {
                         'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
@@ -170,7 +169,7 @@ const TaskFormContainer = (props) => {
                     CompleteAudioForm.append('image', completeAudioWithNewName);
 
                     // Call API to put complete audio in server.
-                    let completeAudioApiResponse = await fetch(`${env.api_url}/tasks/complete_word_audio/${apiResponse.data._id}`,
+                    let completeAudioApiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/complete_word_audio/${apiResponse.data._id}`,
                         {
                             headers: {
                                 'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')

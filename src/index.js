@@ -4,7 +4,6 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import jwt from 'jsonwebtoken';
-import env from './env.json';
 
 // Components
 import Login from './Components/Login/LoginContainer';
@@ -14,7 +13,7 @@ import Cadastro from './Components/Cadastro/CadastroContainer';
 window.auth = (Component, props) => {
   let token = sessionStorage.getItem('access_token') || localStorage.getItem('access_token') || '';
   try {
-    jwt.verify(token, env.jwt_secret);
+    jwt.verify(token, process.env.REACT_APP_JWT_SECRET);
     return <Component {...props} />
   } catch(err){
     return <Login {...props} />

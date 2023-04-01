@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 // Modules
 import { message } from 'antd';
-import env from '../../env.json';
 
 // Components
 import TasksListView from './TasksListView';
@@ -18,7 +17,7 @@ const TasksListContainer = (props) => {
 
         setLoading(true);
         // Call API
-        let apiResponse = await fetch(`${env.api_url}/tasks/backoffice`,
+        let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/backoffice`,
             {
                 headers: {
                     'Accept': 'application/json',
@@ -58,7 +57,7 @@ const TasksListContainer = (props) => {
         setLoading(true);
 
         // Call API
-        let apiResponse = await fetch(`${env.api_url}/tasks/${id}`,
+        let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/${id}`,
             {
                 headers: {
                     'Accept': 'application/json',

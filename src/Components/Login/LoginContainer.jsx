@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 // Modules
 import { message } from 'antd';
-import env from '../../env.json';
 
 // Components
 import LoginView from './LoginView';
@@ -20,7 +19,7 @@ const LoginContainer = (props) => {
         setLoginButtonLoading(true);
 
         // Call API
-        let apiResponse = await fetch(`${env.api_url}/auth/login-admin`, 
+        let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/auth/login-admin`, 
         { 
             headers: {
                 'Accept': 'application/json',
