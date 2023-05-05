@@ -144,6 +144,7 @@ const TaskFormView = (props) => {
                 <div
                     style={{
                         maxHeight: '100%',
+                        height: '85vh',
                         overflow: 'auto'
                     }}
                 >
@@ -179,6 +180,7 @@ const TaskFormView = (props) => {
                             >
                                 <Input
                                     value={props.taskForm.name}
+                                    disabled={props.taskIdToUpdate}
                                     onChange={e => props.setTaskForm({ ...props.taskForm, name: e.target.value })}
                                 />
                             </Form.Item>
@@ -364,7 +366,7 @@ const TaskFormView = (props) => {
                                                     onOk() {
                                                         let syllablesArray = props.taskForm.syllables;
                                                         syllablesArray.splice(i, 1);
-
+                                                        console.log(props.taskForm);
                                                         let audiosArray = props.taskForm.audios;
                                                         audiosArray.splice(i, 1);
 

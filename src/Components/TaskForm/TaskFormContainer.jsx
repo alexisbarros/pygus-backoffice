@@ -11,6 +11,7 @@ const TaskFormContainer = (props) => {
     props = props.parent_props;
 
     const [loading, setLoading] = useState(false);
+    const [taskIdToUpdate, setTaskIdToUpdate] = useState();
 
     useEffect(() => {
         const getTask = async () => {
@@ -19,6 +20,7 @@ const TaskFormContainer = (props) => {
                 setLoading(true);
 
                 const id = props.location.pathname.split('/')[4];
+                setTaskIdToUpdate(id);
 
                 // Call API
                 let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/${id}`,
@@ -235,7 +237,8 @@ const TaskFormContainer = (props) => {
             setSyllableToPush={e => setSyllableToPush(e)}
             audioToPush={audioToPush}
             setAudioToPush={e => setAudioToPush(e)}
-
+            
+            taskIdToUpdate={taskIdToUpdate}
             save={() => save()}
             loadingSaveButton={loadingSaveButton}
         />
