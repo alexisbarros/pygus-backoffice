@@ -10,10 +10,14 @@ const TaskFormContainer = (props) => {
 
     props = props.parent_props;
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         const getTask = async () => {
 
             if (props.location.pathname.includes('/home/task/edit/')) {
+                setLoading(true);
+
                 const id = props.location.pathname.split('/')[4];
 
                 // Call API
@@ -30,7 +34,6 @@ const TaskFormContainer = (props) => {
 
                 // Check if response was successfuly
                 if (apiResponse.code === 200) {
-                    console.log(apiResponse.data);
                     setTaskForm({
                         name: apiResponse.data.name,
                         phoneme: apiResponse.data.phoneme,
@@ -39,23 +42,25 @@ const TaskFormContainer = (props) => {
                         audios: apiResponse.data.audios,
                         completeWordAudio: apiResponse.data.completeWordAudio,
                     })
-                    document.getElementById("task-img-file-thumb").src = `data:image/png;base64,${arrayBufferToBase64(apiResponse.data.image.data.data)}`
+                    document.getElementById("task-img-file-thumb").src = apiResponse.data.image
                     if (apiResponse.data.completeWordAudio.data) document.getElementById("task-complete-audio-file").src = `data:audio/mpeg3;base64,${arrayBufferToBase64(apiResponse.data.completeWordAudio.data.data)}`
-
+                    
                 } else {
 
                     message.error(apiResponse.message);
 
                 }
+
+                setLoading(false);
             }
         };
 
         getTask();
 
-    });
+    }, []);
 
     /**
-     * Transform buffer to base64 to render a image from mongodb
+     * Transform buffer to base64 to render a audio from mongodb
      * @param {*} buffer 
      */
     const arrayBufferToBase64 = (buffer) => {
@@ -92,24 +97,25 @@ const TaskFormContainer = (props) => {
     const save = async () => {
         setLoadingSaveButton(true);
 
-        // // Changing the name of the image
-        // let image = taskForm.image;
-        // let imageWithNewName = image;
-        // if (!image.data) {
-        //     let blob = image.slice(0, image.size, image.type);
-        //     imageWithNewName = new File([blob], `${taskForm.name}`, { type: image.type });
-        // }
+        // Changing the name of the image
+        let image = taskForm.image;
+        let imageWithNewName = image;
+        // if (!image.data && (image.data && typeof image.data !== 'string')) {
+        if (typeof taskForm.data !== 'string') {
+            let blob = image.slice(0, image.size, image.type);
+            imageWithNewName = new File([blob], `${taskForm.name.toUpperCase()}.png`, { type: image.type });
+        }
 
         // Create form to save.
-        let Form = {};
+        let Form = new FormData();
         // Form.append('name', taskForm.name);
         // Form.append('phoneme', taskForm.phoneme);
-        // if (!image.data) Form.append('image', imageWithNewName);
-        // Form.append('syllables', JSON.stringify(taskForm.syllables));
-        Form['name'] = taskForm.name;
-        Form['phoneme'] = taskForm.phoneme;
-        Form['syllables'] = JSON.stringify(taskForm.syllables);
-        console.log(Form);
+        if (typeof taskForm.data !== 'string') Form.append('image', imageWithNewName);
+        
+        Form.append('syllables', JSON.stringify(taskForm.syllables));
+        Form.append('name', taskForm.name);
+        Form.append('phoneme', taskForm.phoneme);
+        Form.append('syllables', JSON.stringify(taskForm.syllables));
         // Call API.
         let endpoint = `${process.env.REACT_APP_API_URL}/tasks`;
         let method = 'POST';
@@ -124,15 +130,14 @@ const TaskFormContainer = (props) => {
             {
                 headers: {
                     'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token'),
-                    'Content-Type': 'application/json',
                 },
                 method: method,
-                body: JSON.stringify(Form)
+                body: Form
             });
         apiResponse = await apiResponse.json();
 
         // Check if response was successfuly
-        if (apiResponse.code === 200) {
+        if (apiResponse.code === 200 && typeof taskForm.audios !== 'object') {
 
             // Changing the name of the audios
             let AudioForm = new FormData();
@@ -157,7 +162,7 @@ const TaskFormContainer = (props) => {
                 });
             audioApiResponse = await audioApiResponse.json();
 
-            if (audioApiResponse.code === 200) {
+            if (audioApiResponse.code === 200 && typeof taskForm.audios !== 'object') {
 
                 // Changing the name of the complete audio
                 let CompleteAudioForm = new FormData();
@@ -166,7 +171,7 @@ const TaskFormContainer = (props) => {
                 if (!audio.data) {
                     let completeAudioBlob = audio.slice(0, audio.size, audio.type);
                     completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.mp3`, { type: audio.type });
-                    CompleteAudioForm.append('image', completeAudioWithNewName);
+                    CompleteAudioForm.append('completeAudio', completeAudioWithNewName);
 
                     // Call API to put complete audio in server.
                     let completeAudioApiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/complete_word_audio/${apiResponse.data._id}`,
@@ -210,13 +215,16 @@ const TaskFormContainer = (props) => {
 
             setLoadingSaveButton(false);
             message.error(apiResponse.message);
-
+        
         }
+        setLoadingSaveButton(false);
     }
 
     return (
 
         <TaskFormView
+            loading={loading}
+
             syllableModal={syllableModal}
             openCloseSyllableModal={e => openCloseSyllableModal(e)}
 

@@ -72,7 +72,7 @@ const TasksListView = (props) => {
 
                 <Space size="middle">
 
-                    {/* <Link to={`/home/task/edit/${record.key}`}>Editar</Link> */}
+                    <Link to={`/home/task/edit/${record.key}`}>Editar</Link>
 
                     <span
                         style={{
