@@ -5,7 +5,7 @@
  * @property {object} body
  * @property {object} headers
  */
-const post = async (params) => {
+export const post = async (params) => {
     const apiResponse = await fetch(params.route,
         {
             headers: params.headers,
@@ -25,7 +25,7 @@ const post = async (params) => {
  * @property {object} body
  * @property {object} headers
  */
-const put = async (params) => {
+export const put = async (params) => {
     const apiResponse = await fetch(params.route,
         {
             headers: params.headers,
@@ -36,9 +36,4 @@ const put = async (params) => {
     const decodedResponse = await apiResponse.json();
 
     return decodedResponse;
-}
-
-module.exports = {
-    post,
-    put,
 }
