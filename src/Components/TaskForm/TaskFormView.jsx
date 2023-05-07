@@ -208,16 +208,15 @@ const TaskFormView = (props) => {
                                             fontSize: 12
                                         }}
                                     >
-                                        <Link to={{ pathname: props.taskForm.image}} target='_blank'>
-                                            <img
-                                                alt='thumb'
-                                                id='task-img-file-thumb'
-                                                style={{
-                                                    height: 50,
-                                                    marginRight: 10
-                                                }}
-                                            />
-                                        </Link>
+                                        <img
+                                            alt='imagem da tarefa'
+                                            src={props.taskForm.image}
+                                            id='task-img-file-thumb'
+                                            style={{
+                                                height: 50,
+                                                marginRight: 10
+                                            }}
+                                        />
                                         {props.taskForm.image.name}
 
                                         <div
@@ -298,9 +297,15 @@ const TaskFormView = (props) => {
                                             style={{
                                                 fontSize: 20,
                                                 marginRight: 20,
-                                                color: 'black'
+                                                color: 'black',
+                                                cursor: 'pointer'
                                             }}
+                                            onClick={() => document.getElementById(`audio-task`).play()}
                                         />
+
+                                        <audio id={`audio-task`}>
+                                            <source src={props.taskForm.completeWordAudio} type="audio/mpeg" />
+                                        </audio>
 
                                         {props.taskForm.completeWordAudio.name}
 
@@ -335,65 +340,71 @@ const TaskFormView = (props) => {
                             </Form.Item>
 
                         </Form>
-
-                        <div
-                            style={{
-                                marginBottom: 10
-                            }}
-                        >
-                            Sílabas
-                        </div>
-
+                        
                         {
-                            props.taskForm.syllables.map((el, i) => {
+                            !props.taskIdToUpdate &&
+                            <div>
 
-                                return (
-                                    <span>
-                                        <Tag
-                                            color={el.isPhoneme ? 'green' : 'default'}
-                                            key={el}
-                                            style={{
-                                                cursor: 'pointer'
-                                            }}
-                                            onClick={() => {
-                                                Modal.confirm({
-                                                    title: 'Deseja excluir essa silaba?',
-                                                    icon: <ExclamationCircleOutlined />,
-                                                    content: 'Essa ação não poderá ser desfeita',
-                                                    okText: 'Sim',
-                                                    okType: 'danger',
-                                                    cancelText: 'Não',
-                                                    onOk() {
-                                                        let syllablesArray = props.taskForm.syllables;
-                                                        syllablesArray.splice(i, 1);
-                                                        console.log(props.taskForm);
-                                                        let audiosArray = props.taskForm.audios;
-                                                        audiosArray.splice(i, 1);
+                                <div
+                                    style={{
+                                        marginBottom: 10
+                                    }}
+                                >
+                                    Sílabas
+                                </div>
 
-                                                        props.setTaskForm({ ...props.taskForm, syllables: syllablesArray, audios: audiosArray });
-                                                    },
-                                                });
-                                            }}
-                                        >
-                                            {el.syllable.toUpperCase()}
-                                        </Tag>
-                                    </span>
-                                )
-                            })
+                                {
+                                    props.taskForm.syllables.map((el, i) => {
+
+                                        return (
+                                            <span>
+                                                <Tag
+                                                    color={el.isPhoneme ? 'green' : 'default'}
+                                                    key={el}
+                                                    style={{
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={() => {
+                                                        Modal.confirm({
+                                                            title: 'Deseja excluir essa silaba?',
+                                                            icon: <ExclamationCircleOutlined />,
+                                                            content: 'Essa ação não poderá ser desfeita',
+                                                            okText: 'Sim',
+                                                            okType: 'danger',
+                                                            cancelText: 'Não',
+                                                            onOk() {
+                                                                let syllablesArray = props.taskForm.syllables;
+                                                                syllablesArray.splice(i, 1);
+                                                                console.log(props.taskForm);
+                                                                let audiosArray = props.taskForm.audios;
+                                                                audiosArray.splice(i, 1);
+
+                                                                props.setTaskForm({ ...props.taskForm, syllables: syllablesArray, audios: audiosArray });
+                                                            },
+                                                        });
+                                                    }}
+                                                >
+                                                    {el.syllable.toUpperCase()}
+                                                </Tag>
+                                            </span>
+                                        )
+                                    })
+                                }
+
+                                <br />
+
+                                <Divider />
+
+                                <Button
+                                    style={{
+                                        marginRight: 10
+                                    }}
+                                    onClick={() => props.openCloseSyllableModal(true)}
+                                >
+                                    Inserir sílaba
+                                </Button>
+                            </div>
                         }
-
-                        <br />
-
-                        <Divider />
-
-                        <Button
-                            style={{
-                                marginRight: 10
-                            }}
-                            onClick={() => props.openCloseSyllableModal(true)}
-                        >
-                            Inserir sílaba
-                        </Button>
 
                         <Button
                             type='primary'
@@ -402,6 +413,7 @@ const TaskFormView = (props) => {
                             }
                             onClick={() => props.save()}
                             loading={props.loadingSaveButton}
+                            style={{ marginTop: 30, float: 'right', width: '200px' }}
                         >
                             Salvar
                         </Button>

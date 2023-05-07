@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-
-// Modules
 import { message } from 'antd';
+import { post, put } from '../../services/api';
 
-// Components
 import TaskFormView from './TaskFormView';
 
 const TaskFormContainer = (props) => {
@@ -12,6 +10,11 @@ const TaskFormContainer = (props) => {
 
     const [loading, setLoading] = useState(false);
     const [taskIdToUpdate, setTaskIdToUpdate] = useState();
+    const [syllableModal, setSyllableModal] = useState(false);
+    const [syllableToPush, setSyllableToPush] = useState({ syllable: '', isPhoneme: false, });
+    const [audioToPush, setAudioToPush] = useState('');
+    const [taskForm, setTaskForm] = useState({ name: '', image: '', syllables: [], audios: [], phoneme: '', completeWordAudio: '' });
+    const [loadingSaveButton, setLoadingSaveButton] = useState(false);
 
     useEffect(() => {
         const getTask = async () => {
@@ -22,7 +25,6 @@ const TaskFormContainer = (props) => {
                 const id = props.location.pathname.split('/')[4];
                 setTaskIdToUpdate(id);
 
-                // Call API
                 let apiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/${id}`,
                     {
                         headers: {
@@ -34,18 +36,14 @@ const TaskFormContainer = (props) => {
                     });
                 apiResponse = await apiResponse.json();
 
-                // Check if response was successfuly
                 if (apiResponse.code === 200) {
                     setTaskForm({
                         name: apiResponse.data.name,
                         phoneme: apiResponse.data.phoneme,
-                        image: apiResponse.data.image,
+                        image: `${process.env.REACT_APP_API_URL}/public/tasks_images/${removeAccents(apiResponse.data.name)}.png`,
                         syllables: apiResponse.data.syllables,
-                        audios: apiResponse.data.audios,
-                        completeWordAudio: apiResponse.data.completeWordAudio,
-                    })
-                    document.getElementById("task-img-file-thumb").src = apiResponse.data.image
-                    if (apiResponse.data.completeWordAudio.data) document.getElementById("task-complete-audio-file").src = `data:audio/mpeg3;base64,${arrayBufferToBase64(apiResponse.data.completeWordAudio.data.data)}`
+                        completeWordAudio: `${process.env.REACT_APP_API_URL}/public/tasks_complete_audios/${removeAccents(apiResponse.data.name)}.mp3`,
+                    });
                     
                 } else {
 
@@ -61,169 +59,111 @@ const TaskFormContainer = (props) => {
 
     }, []);
 
-    /**
-     * Transform buffer to base64 to render a audio from mongodb
-     * @param {*} buffer 
-     */
-    const arrayBufferToBase64 = (buffer) => {
-        var binary = '';
-        var bytes = [].slice.call(new Uint8Array(buffer));
-        bytes.forEach((b) => binary += String.fromCharCode(b));
-        return window.btoa(binary);
+    const openCloseSyllableModal = (boolean) => setSyllableModal(boolean);
+
+    const save = async () => {
+        setLoadingSaveButton(true);
+        
+        let ImgForm = new FormData();
+        let CompleteAudioForm = new FormData();
+
+        let image = taskForm.image;
+        if (typeof image !== 'string') {
+            const imageBlob = image.slice(0, image.size, image.type);
+            const imageWithNewName = new File(
+                [imageBlob], 
+                `${removeAccents(taskForm.name).toUpperCase()}.png`, 
+                { type: image.type }
+            );
+            ImgForm.append('image', imageWithNewName);
+        }
+        
+        let audio = taskForm.completeWordAudio;
+        if (typeof audio !== 'string') {
+            const audioBlob = audio.slice(0, audio.size, audio.type);
+            const audioWithNewName = new File(
+                [audioBlob], 
+                `${removeAccents(taskForm.name).toUpperCase()}.mp3`, 
+                { type: audio.type }
+            );
+            CompleteAudioForm.append('completeAudio', audioWithNewName);
+        }
+
+        
+        const body = {
+            syllables: taskForm.syllables,
+            name: taskForm.name,
+            phoneme: taskForm.phoneme,
+        };
+        
+        const baseRoute = `${process.env.REACT_APP_API_URL}/tasks`;
+        const headers = {
+            'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token'),
+        };
+
+        const apiResponse = taskIdToUpdate ?
+            await put({
+                route: `${baseRoute}/${taskIdToUpdate}`,
+                body: JSON.stringify(body),
+                headers: {
+                    ...headers,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+            :
+            await post({
+                route: baseRoute,
+                body: JSON.stringify(body),
+                headers: {
+                    ...headers,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
+
+        if (apiResponse.code === 200) {
+            post({ route: `${baseRoute}/upload/image`, body: ImgForm, headers});
+            post({ route: `${baseRoute}/upload/audio`, body: CompleteAudioForm, headers});
+            
+            if (!taskIdToUpdate) {
+                
+                let AudioForm = new FormData();
+                let audios = taskForm.audios;
+                audios.forEach((el_audio, index_audio) => {
+                    let audioWithNewName = el_audio;
+                    if (!el_audio.data) {
+                        let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
+                        audioWithNewName = new File([audioBlob], `${removeAccents(taskForm.name).toUpperCase()}__${removeAccents(taskForm.syllables[index_audio].syllable).toUpperCase()}.mp3`, { type: el_audio.type });
+                        AudioForm.append('audios', audioWithNewName);
+                    }
+                })
+                
+                await post({ route: `${baseRoute}/upload/audios`, body: AudioForm, headers});
+
+                message.success(`Tarefa ${taskIdToUpdate ? 'atualizada' : 'criada'} com sucesso`);
+                setLoadingSaveButton(false);
+                props.history.push('/home/task');
+                
+            } else {
+                
+                message.success(`Tarefa ${taskIdToUpdate ? 'atualizada' : 'criada'} com sucesso`);
+                setLoadingSaveButton(false);
+                props.history.push('/home/task');
+
+            }
+        }
+
+        setLoadingSaveButton(false);
     }
 
     /**
-     * Open and close syllable modal
-     * @param {Boolean} boolean
+     * Remove accents
+     * @param {String} term 
+     * @returns Term without accents
      */
-    const [syllableModal, setSyllableModal] = useState(false);
-    const openCloseSyllableModal = (boolean) => {
-        setSyllableModal(boolean);
-    };
-
-    /**
-     * Set syllable and audio to push in array
-     */
-    const [syllableToPush, setSyllableToPush] = useState({ syllable: '', isPhoneme: false, });
-    const [audioToPush, setAudioToPush] = useState('');
-
-    /**
-     * Set form.
-     */
-    const [taskForm, setTaskForm] = useState({ name: '', image: '', syllables: [], audios: [], phoneme: '', completeWordAudio: '' });
-
-    /**
-     * Save task.
-     */
-    const [loadingSaveButton, setLoadingSaveButton] = useState(false);
-    const save = async () => {
-        setLoadingSaveButton(true);
-
-        // Changing the name of the image
-        let image = taskForm.image;
-        let imageWithNewName = image;
-        // if (!image.data && (image.data && typeof image.data !== 'string')) {
-        if (typeof taskForm.data !== 'string') {
-            let blob = image.slice(0, image.size, image.type);
-            imageWithNewName = new File(
-                [blob], 
-                `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.png`, 
-                { type: image.type }
-            );
-        }
-
-        // Create form to save.
-        let Form = new FormData();
-        // Form.append('name', taskForm.name);
-        // Form.append('phoneme', taskForm.phoneme);
-        if (typeof taskForm.data !== 'string') Form.append('image', imageWithNewName);
-        
-        Form.append('syllables', JSON.stringify(taskForm.syllables));
-        Form.append('name', taskForm.name);
-        Form.append('phoneme', taskForm.phoneme);
-        Form.append('syllables', JSON.stringify(taskForm.syllables));
-        // Call API.
-        let endpoint = `${process.env.REACT_APP_API_URL}/tasks`;
-        let method = 'POST';
-        let methodDescription = 'criada'
-        if (props.location.pathname.includes('/home/task/edit/')) {
-            let id = props.location.pathname.split('/')[4];
-            endpoint = `${process.env.REACT_APP_API_URL}/tasks/${id}`;
-            method = 'PUT';
-            methodDescription = 'atualizada';
-        }
-        let apiResponse = await fetch(endpoint,
-            {
-                headers: {
-                    'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token'),
-                },
-                method: method,
-                body: Form
-            });
-        apiResponse = await apiResponse.json();
-
-        // Check if response was successfuly
-        if (apiResponse.code === 200 && typeof taskForm.audios !== 'object') {
-
-            // Changing the name of the audios
-            let AudioForm = new FormData();
-            let audios = taskForm.audios;
-            audios.forEach((el_audio, index_audio) => {
-                let audioWithNewName = el_audio;
-                if (!el_audio.data) {
-                    let audioBlob = el_audio.slice(0, el_audio.size, el_audio.type);
-                    audioWithNewName = new File([audioBlob], `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}_${taskForm.syllables[index_audio].syllable.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.mp3`, { type: el_audio.type });
-                    AudioForm.append('audios', audioWithNewName);
-                }
-            })
-
-            // Call API to put audios in server.
-            let audioApiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/audios/${apiResponse.data._id}`,
-                {
-                    headers: {
-                        'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
-                    },
-                    method: 'PUT',
-                    body: AudioForm
-                });
-            audioApiResponse = await audioApiResponse.json();
-
-            if (audioApiResponse.code === 200 && typeof taskForm.audios !== 'object') {
-
-                // Changing the name of the complete audio
-                let CompleteAudioForm = new FormData();
-                let audio = taskForm.completeWordAudio;
-                let completeAudioWithNewName = audio;
-                if (!audio.data) {
-                    let completeAudioBlob = audio.slice(0, audio.size, audio.type);
-                    completeAudioWithNewName = new File([completeAudioBlob], `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.mp3`, { type: audio.type });
-                    CompleteAudioForm.append('completeAudio', completeAudioWithNewName);
-
-                    // Call API to put complete audio in server.
-                    let completeAudioApiResponse = await fetch(`${process.env.REACT_APP_API_URL}/tasks/complete_word_audio/${apiResponse.data._id}`,
-                        {
-                            headers: {
-                                'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token')
-                            },
-                            method: 'PUT',
-                            body: CompleteAudioForm
-                        });
-                    completeAudioApiResponse = await completeAudioApiResponse.json();
-
-                    if (completeAudioApiResponse.code === 200) {
-
-                        message.success(`Tarefa ${methodDescription} com sucesso`);
-                        setLoadingSaveButton(false);
-                        props.history.push('/home/task');
-
-                    } else {
-
-                        setLoadingSaveButton(false);
-                        message.error(audioApiResponse.message);
-
-                    }
-                } else {
-                    message.success(`Tarefa ${methodDescription} com sucesso`);
-                    setLoadingSaveButton(false);
-                    props.history.push('/home/task');
-                }
-
-
-            } else {
-
-                setLoadingSaveButton(false);
-                message.error(audioApiResponse.message);
-
-            }
-
-
-        } else {
-
-            setLoadingSaveButton(false);
-            message.error(apiResponse.message);
-        
-        }
-        setLoadingSaveButton(false);
+    const removeAccents = (term) => {
+        return term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
     return (

@@ -16,6 +16,36 @@ const TasksListView = (props) => {
             title: 'Nome',
             dataIndex: 'name',
             key: 'name',
+            render: (originalName) => {
+                const name = originalName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return (
+                    <Fragment>
+                        <audio id={`audio-${name}`}>
+                            <source src={`${process.env.REACT_APP_API_URL}/public/tasks_complete_audios/${name}.mp3`} type="audio/mpeg" />
+                        </audio>
+                        <Tag
+                            key={originalName}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => document.getElementById(`audio-${name}`).play()}
+                        >
+                            {originalName}
+                        </Tag>
+                    </Fragment>
+                )
+            }
+        },
+        {
+            title: 'Imagem',
+            dataIndex: 'image',
+            key: 'image',
+            render: (image, row) => {
+                const name = row.originalName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return (
+                    <a href={`${process.env.REACT_APP_API_URL}/public/tasks_images/${name}.png`} target='_blank'>
+                        <img src={`${process.env.REACT_APP_API_URL}/public/tasks_images/${name}.png`} alt='Imagem da tarefa' height="100"/>
+                    </a>
+                );
+            }
         },
         {
             title: 'Sílabas',
@@ -25,8 +55,13 @@ const TasksListView = (props) => {
                 <span>
 
                     {syllables.map((el, index) => {
+                        const name = row.originalName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        const syllable = el.syllable.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                         return (
                             <Fragment>
+                                <audio id={`audio-syllable-${name}-${syllable}`}>
+                                    <source src={`${process.env.REACT_APP_API_URL}/public/tasks_audios/${name}/${syllable}.mp3`} type="audio/mpeg" />
+                                </audio>
                                 <Tag
                                     color={el.isPhoneme ? 'green' : 'default'}
                                     key={el}
@@ -34,7 +69,7 @@ const TasksListView = (props) => {
                                         cursor: 'pointer'
                                     }}
                                     onClick={() => {
-                                        document.getElementById(`audio-syllable-${row.originalName}-${el.syllable}`).play();
+                                        document.getElementById(`audio-syllable-${name}-${syllable}`).play();
                                     }}
                                 >
                                     {el.syllable.toUpperCase()}
