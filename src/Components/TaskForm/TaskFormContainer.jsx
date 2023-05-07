@@ -105,7 +105,11 @@ const TaskFormContainer = (props) => {
         // if (!image.data && (image.data && typeof image.data !== 'string')) {
         if (typeof taskForm.data !== 'string') {
             let blob = image.slice(0, image.size, image.type);
-            imageWithNewName = new File([blob], `${taskForm.name.toUpperCase()}.png`, { type: image.type });
+            imageWithNewName = new File(
+                [blob], 
+                `${taskForm.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()}.png`, 
+                { type: image.type }
+            );
         }
 
         // Create form to save.
