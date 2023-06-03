@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 // Modules
 import { message } from 'antd';
+import { post } from '../../services/api';
 
 // Components
 import TasksListView from './TasksListView';
 
 const TasksListContainer = (props) => {
 
+    const [phonemes, setPhonemes] = useState([]);
+    const [phonemeModal, setPhonemeModal] = useState(false);
+    const [taskToCopy, setTaskToCopy] = useState();
+    const [copingTask, setCopingTask] = useState(false);
     /**
      * Get tasks.
      */
@@ -32,6 +37,7 @@ const TasksListContainer = (props) => {
         if (apiResponse.code === 200) {
 
             setTasks([...apiResponse.data]);
+            setPhonemes([...getPhonemes(apiResponse.data)]);
             setLoading(false);
 
         } else {
@@ -94,6 +100,44 @@ const TasksListContainer = (props) => {
         return window.btoa(binary);
     }
 
+    const getPhonemes = (tasks) => {
+        const phonemes = tasks.map(el => el.phoneme);
+        return [...new Set(phonemes)];
+    }
+
+    const copyTask = async () => {
+        setCopingTask(true);
+
+        const body = {
+            syllables: taskToCopy.syllables,
+            name: taskToCopy.name,
+            phoneme: taskToCopy.phoneme,
+        };
+        
+        const baseRoute = `${process.env.REACT_APP_API_URL}/tasks`;
+        const headers = { 'access_token': sessionStorage.getItem('access_token') || localStorage.getItem('access_token') };
+
+        const apiResponse = await post({
+            route: baseRoute,
+            body: JSON.stringify(body),
+            headers: {
+                ...headers,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (apiResponse.code !== 200){
+            message.error('Erro ao copiar a tarefa');
+            return setCopingTask(false);
+        }
+        
+        message.success('Tarefa copiada com sucesso');
+        setCopingTask(false);
+        setPhonemeModal(false);
+        return getTasks();
+    }
+
     return (
 
         <TasksListView
@@ -101,6 +145,14 @@ const TasksListContainer = (props) => {
             loading={loading}
             tasks={tasks}
             removeTask={id => removeTask(id)}
+            
+            phonemes={phonemes}
+            phonemeModal={phonemeModal}
+            setPhonemeModal={e => setPhonemeModal(e)}
+            taskToCopy={taskToCopy}
+            setTaskToCopy={e => setTaskToCopy(e)}
+            copingTask={copingTask}
+            copyTask={() => copyTask()}
 
             arrayBufferToBase64={buffer => arrayBufferToBase64(buffer)}
 
